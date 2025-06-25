@@ -85,6 +85,22 @@ async def get_conversation_messages(
     return messages
 
 
+@router.get(
+    "/conversations",
+    response_model=List[ConversationResponse],
+    summary="Get all conversations",
+    description="Retrieves a list of all conversations with their messages."
+)
+async def get_all_conversations(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db)
+):
+    """Endpoint to retrieve all conversations."""
+    conversations = crud.get_conversations(db, skip=skip, limit=limit)
+    return conversations
+
+
 @router.post(
     "/conversation/{conversation_id}/send_message",
     response_model=MessageResponse,
