@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendMessageBtn = document.getElementById('sendMessageBtn');
     const systemPromptSelect = document.getElementById('systemPrompt');
     const newConversationBtn = document.getElementById('newConversationBtn');
+    const geminiApiKeyInput = document.getElementById('geminiApiKey'); // New: Get API Key input
 
     let currentConversationId = null;
 
@@ -37,6 +38,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to start a new conversation
     async function startNewConversation() {
         const selectedPrompt = systemPromptSelect.value;
+        const apiKey = geminiApiKeyInput.value.trim(); // Get API key
+
+        if (!apiKey) {
+            displayMessage('ai', 'Please enter your Gemini API Key before starting a new conversation.');
+            return;
+        }
+
         try {
             const response = await fetch('/api/conversation', {
                 method: 'POST',
@@ -64,9 +72,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to send a user message and get AI response
     async function sendMessage() {
         const messageContent = userMessageInput.value.trim();
+        const apiKey = geminiApiKeyInput.value.trim(); // Get API key
+
         if (!messageContent) return;
         if (currentConversationId === null) {
             displayMessage('ai', 'Please start a new conversation first.');
+            return;
+        }
+        if (!apiKey) {
+            displayMessage('ai', 'Please enter your Gemini API Key before sending a message.');
             return;
         }
 
@@ -79,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ message_content: messageContent }),
+                body: JSON.stringify({ message_content: messageContent, api_key: apiKey }), // Include API key
             });
 
             if (!response.ok) {
@@ -105,5 +119,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initial setup: Try to start a default conversation or prompt the user
     // For simplicity, we'll just prompt the user to start a new conversation initially.
-    displayMessage('ai', 'Welcome to PromptCraft AI Chat! Please select a system prompt and click "Start New Conversation" to begin.');
+    displayMessage('ai', 'Welcome to PromptCraft AI Chat! Please enter your Gemini API Key, then select a system prompt and click "Start New Conversation" to begin.');
 });

@@ -43,6 +43,7 @@ class ConversationResponse(ConversationBase):
 
 class UserMessageRequest(BaseModel):
     message_content: str
+    api_key: str # Add api_key field
 
 
 @router.post(
@@ -116,6 +117,7 @@ async def send_user_message_and_get_ai_response(
     # The last message in chat_history_for_gemini is the current user message, which should be passed as user_message.
     # The chat_history for the model should be everything *before* the current user message.
     ai_response_content = await generate_gemini_response(
+        api_key=user_message_req.api_key, # Pass the API key
         system_prompt=db_conversation.system_prompt_used,
         chat_history=chat_history_for_gemini[:-1], # Pass history *before* current user message
         user_message=user_message_req.message_content

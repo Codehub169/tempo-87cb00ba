@@ -115,12 +115,34 @@
         .prompt-selection button:hover {
             background-color: #0056b3;
         }
+        .api-key-input {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .api-key-input label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .api-key-input input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>PromptCraft AI Chat</h1>
+        </div>
+        <div class="api-key-input">
+            <label for="geminiApiKey">Gemini API Key:</label>
+            <input type="text" id="geminiApiKey" placeholder="Enter your Gemini API key here">
         </div>
         <div class="prompt-selection">
             <label for="systemPrompt">Select System Prompt:</label>

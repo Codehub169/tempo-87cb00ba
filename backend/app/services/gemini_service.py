@@ -1,10 +1,9 @@
 from typing import List, Dict
 import google.generativeai as genai
-from backend.app.core.config import settings
 
-async def generate_gemini_response(system_prompt: str, chat_history: List[Dict], user_message: str) -> str:
+async def generate_gemini_response(api_key: str, system_prompt: str, chat_history: List[Dict], user_message: str) -> str:
     """Generates an AI response using the Google Gemini API."""
-    genai.configure(api_key=settings.GEMINI_API_KEY)
+    genai.configure(api_key=api_key)
 
     # Initialize the model with the system prompt
     # Using 'gemini-2.5-flash' as a general-purpose model, can be updated to newer models like 'gemini-1.5-pro-latest'
