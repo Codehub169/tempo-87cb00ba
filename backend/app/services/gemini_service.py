@@ -7,10 +7,10 @@ async def generate_gemini_response(system_prompt: str, chat_history: List[Dict],
     genai.configure(api_key=settings.GEMINI_API_KEY)
 
     # Initialize the model with the system prompt
-    # Using 'gemini-pro' as a general-purpose model, can be updated to newer models like 'gemini-1.5-pro-latest'
+    # Using 'gemini-2.5-flash' as a general-purpose model, can be updated to newer models like 'gemini-1.5-pro-latest'
     # if system instruction support is confirmed for that specific model and API version.
     model = genai.GenerativeModel(
-        model_name='gemini-pro',
+        model_name='gemini-2.5-flash',
         system_instruction=system_prompt
     )
 
