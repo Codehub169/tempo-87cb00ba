@@ -36,12 +36,14 @@
             flex-direction: column;
             gap: 20px;
             overflow-y: auto; /* Scroll for sidebar content */
+            flex-shrink: 0; /* Prevent sidebar from shrinking */
         }
         .chat-container {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
             padding: 20px;
+            min-width: 400px; /* Minimum width for chat container to prevent squishing */
         }
         .header {
             text-align: center;
@@ -82,6 +84,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative; /* For absolute positioning of delete button */
+            padding-right: 40px; /* Make space for the delete button */
         }
         #conversationsList li:hover {
             background-color: #e0faff;
@@ -93,6 +97,25 @@
             background-color: #cce7ee;
             font-weight: bold;
             color: #0056b3;
+        }
+        .delete-conversation-btn {
+            background: none;
+            border: none;
+            color: #dc3545; /* Red color for delete */
+            font-size: 1.1em;
+            cursor: pointer;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 5px;
+            line-height: 1;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+        .delete-conversation-btn:hover {
+            opacity: 1;
+            color: #c82333;
         }
         label {
             display: block;
@@ -150,11 +173,13 @@
             padding: 10px 15px;
             border-radius: 18px;
             max-width: 75%; /* Slightly wider messages */
-            word-wrap: break-word;
+            word-wrap: break-word; /* Ensure long words break */
+            word-break: break-word; /* For CJK and other scripts */
             line-height: 1.5;
             font-size: 0.95em;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
             position: relative;
+            white-space: pre-wrap; /* Preserve whitespace and line breaks for markdown */
         }
         .message .timestamp {
             font-size: 0.75em;
@@ -184,6 +209,7 @@
             display: flex;
             gap: 10px;
             margin-top: 15px;
+            flex-shrink: 0; /* Prevent input area from shrinking */
         }
         .input-area input[type="text"] {
             flex-grow: 1;
@@ -238,6 +264,8 @@
         </div>
     </div>
 
+    <!-- Include marked.js for Markdown parsing -->
+    <script src="/static/marked.min.js"></script>
     <script src="/static/script.js"></script>
 </body>
 </html>
