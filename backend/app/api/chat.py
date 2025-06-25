@@ -6,8 +6,7 @@ import datetime # Import datetime
 
 from backend.app import crud, models
 from backend.app.database import get_db
-# Assuming gemini_service will be implemented later, for now we'll mock its behavior.
-# from backend.app.services.gemini_service import generate_gemini_response
+from backend.app.services.gemini_service import generate_gemini_response
 
 router = APIRouter()
 
@@ -44,16 +43,6 @@ class ConversationResponse(ConversationBase):
 
 class UserMessageRequest(BaseModel):
     message_content: str
-
-# Mock Gemini Service response for now
-async def mock_generate_gemini_response(system_prompt: str, chat_history: List[dict], user_message: str) -> str:
-    """Mocks a Gemini AI response based on system prompt and chat history."""
-    # In a real scenario, this would call the Gemini API
-    response_text = f"I received your message: '{user_message}'.\n\n"
-    response_text += f"The current system prompt is: '{system_prompt}'.\n\n"
-    response_text += "This is a simulated AI response. Please note that the actual Gemini AI would provide a more nuanced and context-aware reply.\n\n"
-    response_text += "Feel free to continue the conversation or modify the system prompt!"
-    return response_text
 
 
 @router.post(
@@ -107,7 +96,7 @@ async def send_user_message_and_get_ai_response(
     db: Session = Depends(get_db)
 ):
     """Endpoint to send a user message and receive an AI response."""
-    db_conversation = crud.get_conversation(db, conversation_id)
+    db_conversation = crud.get_conversation(db, conversation_id);
     if not db_conversation:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found.")
 
@@ -116,19 +105,17 @@ async def send_user_message_and_get_ai_response(
         db=db, conversation_id=conversation_id, sender="user", content=user_message_req.message_content
     )
 
-    # 2. Prepare chat history for AI model (excluding the latest user message for now)
-    # In a real application, you might fetch a limited history or process it differently.
+    # 2. Prepare chat history for AI model
     chat_history_messages = crud.get_messages_for_conversation(db, conversation_id)
     chat_history_for_gemini = [
-        {"role": msg.sender, "parts": [msg.content]} 
+        {"role": msg.sender, "parts": [msg.content]}
         for msg in chat_history_messages
     ]
-    
-    # Add the current user message to the history for the AI call
-    chat_history_for_gemini.append({"role": "user", "parts": [user_message_req.message_content]})
 
-    # 3. Get AI response (using mock service for now)
-    ai_response_content = await mock_generate_gemini_response(
+    # 3. Get AI response
+    # The last message in chat_history_for_gemini is the current user message, which should be passed as user_message.
+    # The chat_history for the model should be everything *before* the current user message.
+    ai_response_content = await generate_gemini_response(
         system_prompt=db_conversation.system_prompt_used,
         chat_history=chat_history_for_gemini[:-1], # Pass history *before* current user message
         user_message=user_message_req.message_content
