@@ -39,6 +39,11 @@ body {
     --dark-mode-active-bg: #0056b3; /* Keep primary blue for active highlight */
 }
 
+/* Apply border-box globally for easier layout calculations */
+* {
+    box-sizing: border-box;
+}
+
 body.dark-mode {
     background-color: var(--dark-mode-bg);
     color: var(--dark-mode-text-color);
@@ -63,7 +68,7 @@ body.dark-mode .main-wrapper {
 
 .sidebar {
     flex: 0 0 400px; /* Increased width for better text visibility */
-    background-color: var(--sidebar-bg);
+    background-color: var(--light-bg); /* Fixed: Changed from --sidebar-bg (undefined) to --light-bg */
     padding: 25px;
     border-right: 1px solid var(--neutral-border);
     display: flex;
@@ -84,6 +89,7 @@ body.dark-mode .sidebar {
     flex-direction: column;
     padding: 25px;
     height: 100%;
+    gap: 20px; /* Add gap between children */
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 .header {
@@ -291,7 +297,7 @@ button:active {
     gap: 15px;
     background-color: var(--light-bg);
     box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.03);
-    margin-bottom: 20px;
+    /* Removed margin-bottom: 20px; to let flex gap manage spacing */
     transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
