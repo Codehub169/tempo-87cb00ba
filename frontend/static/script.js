@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const newPromptContentTextarea = document.getElementById('newPromptContent');
     const savePromptBtn = document.getElementById('savePromptBtn');
     const savedPromptsList = document.getElementById('savedPromptsList');
+    const darkModeToggle = document.getElementById('darkModeToggle');
 
     let currentConversationId = null;
 
@@ -364,6 +365,36 @@ document.addEventListener('DOMContentLoaded', () => {
             displayMessage('ai', 'Error deleting conversation. Please try again.');
         }
     }
+
+    // Dark Mode Toggle Logic
+    function applyDarkMode(isDark) {
+        if (isDark) {
+            document.body.classList.add('dark-mode');
+            darkModeToggle.textContent = 'Toggle Light Mode';
+        } else {
+            document.body.classList.remove('dark-mode');
+            darkModeToggle.textContent = 'Toggle Dark Mode';
+        }
+    }
+
+    // Check for saved dark mode preference on load
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode === 'enabled') {
+        applyDarkMode(true);
+    } else {
+        applyDarkMode(false);
+    }
+
+    darkModeToggle.addEventListener('click', () => {
+        const isCurrentlyDark = document.body.classList.contains('dark-mode');
+        if (isCurrentlyDark) {
+            applyDarkMode(false);
+            localStorage.setItem('darkMode', 'disabled');
+        } else {
+            applyDarkMode(true);
+            localStorage.setItem('darkMode', 'enabled');
+        }
+    });
 
     // Event Listeners
     newConversationBtn.addEventListener('click', startNewConversation);
