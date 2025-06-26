@@ -2,7 +2,8 @@
 <html>
 <head>
   <meta charset="utf-8"/>
-  <title>Marked in the browser</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PromptCraft AI Chat</title>
     <style>
         :root {
             --primary-blue: #4A90E2;
@@ -30,8 +31,9 @@
             padding: 0;
             background-color: var(--light-background);
             display: flex;
+            flex-direction: column; /* Changed to column for overall layout */
             justify-content: center;
-            align-items: stretch;
+            align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
             color: var(--dark-text);
@@ -39,17 +41,19 @@
         }
         .main-wrapper {
             display: flex;
+            flex-direction: row; /* Default to row for desktop */
             width: 100%;
-            max-width: 1300px; /* Slightly wider */
+            max-width: 1400px; /* Wider */
             background-color: #ffffff;
             border-radius: 12px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12); /* Softer, larger shadow */
             overflow: hidden;
             height: calc(100vh - 40px); /* Taller */
             margin: 20px;
+            flex-wrap: nowrap; /* Prevent wrapping on desktop */
         }
         .sidebar {
-            width: 320px; /* Slightly wider sidebar */
+            width: 350px; /* Slightly wider sidebar */
             background-color: var(--sidebar-bg);
             padding: 25px;
             border-right: 1px solid var(--neutral-border);
@@ -64,13 +68,14 @@
             display: flex;
             flex-direction: column;
             padding: 25px;
-            /* min-width: 500px; Removed to prevent horizontal overflow on narrower screens */
             height: 100%;
+            min-width: 400px; /* Ensure chat container has a minimum width */
         }
         .header {
             text-align: center;
             margin-bottom: 30px;
             color: var(--primary-blue);
+            flex-shrink: 0;
         }
         h1 {
             font-size: 2.5em;
@@ -199,7 +204,7 @@
             box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
         }
         button:hover {
-            background-color: '#3A7BBF'; /* Darker shade of primary blue */
+            background-color: #3A7BBF; /* Darker shade of primary blue */
             transform: translateY(-2px);
         }
         button:active {
@@ -213,7 +218,7 @@
         }
         #newConversationBtn:hover,
         #savePromptBtn:hover {
-            background-color: '#43B069';
+            background-color: #43B069;
         }
         .chat-window {
             flex: 1;
@@ -344,19 +349,37 @@
         }
 
         /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .main-wrapper {
+                max-width: 95%; /* Adjust max-width for slightly smaller screens */
+                margin: 15px;
+            }
+        }
+
         @media (max-width: 768px) {
             .main-wrapper {
                 flex-direction: column;
+                height: auto; /* Allow height to adjust */
                 margin: 10px;
-                min-height: unset;
+                border-radius: 8px;
             }
             .sidebar {
                 width: 100%;
                 border-right: none;
                 border-bottom: 1px solid var(--neutral-border);
+                padding: 15px;
+                gap: 15px;
             }
             .chat-container {
                 min-width: unset;
+                padding: 15px;
+                height: auto; /* Allow height to adjust on smaller screens */
+            }
+            .header {
+                margin-bottom: 20px;
+            }
+            .chat-window {
+                margin-bottom: 15px;
                 padding: 15px;
             }
             .input-area {
@@ -366,6 +389,12 @@
             .input-area input[type="text"],
             .input-area button {
                 width: 100%;
+            }
+            .api-key-input,
+            .prompt-input-area,
+            .conversations-history,
+            .prompt-management-area {
+                padding: 15px;
             }
         }
     </style>
