@@ -6,8 +6,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const newConversationBtn = document.getElementById('newConversationBtn');
     const geminiApiKeyInput = document.getElementById('geminiApiKey');
     const conversationsList = document.getElementById('conversationsList');
+    const newPromptNameInput = document.getElementById('newPromptName');
+    const newPromptContentTextarea = document.getElementById('newPromptContent');
+    const savePromptBtn = document.getElementById('savePromptBtn');
+    const savedPromptsList = document.getElementById('savedPromptsList');
 
     let currentConversationId = null;
+
+    // Default prompts (will be added to the select always)
+    const defaultPrompts = [
+        { name: 'Helpful AI Assistant', content: 'You are a helpful AI assistant. Please format your responses using Markdown.' },
+        { name: 'Creative Writing Assistant', content: 'You are a creative writing assistant. Please format your responses using Markdown.' },
+        { name: 'Coding Expert', content: 'You are a coding expert. Please format your responses using Markdown, especially for code blocks.' },
+        { name: 'Concise Chatbot', content: 'You are a friendly chatbot that provides concise answers. Please format your responses using Markdown.' }
+    ];
 
     // Function to format timestamp
     function formatTimestamp(timestamp) {
@@ -93,8 +105,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const promptSnippet = convo.system_prompt_used.substring(0, 30) + '...';
                 const date = new Date(convo.created_at).toLocaleDateString();
                 // Add delete button
-                listItem.innerHTML = `<span>${promptSnippet}</span><span style="font-size:0.8em; color:#888;">${date}</span><button class="delete-conversation-btn" data-id="${convo.id}">🗑️</button>`;
-                
+                listItem.innerHTML = `<span>${promptSnippet}</span><span style="font-size:0.8em; color:#888;">${date}</span><button class="delete-conversation-btn" data-id="${convo.id}">&#128465;&#xfe0f;</button>`;
+
                 listItem.addEventListener('click', (event) => {
                     // Only fetch messages if the click wasn't on the delete button
                     if (!event.target.classList.contains('delete-conversation-btn')) {
@@ -129,9 +141,126 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Function to load and display system prompts
+    async function loadPrompts() {
+        try {
+            const response = await fetch('/api/prompts');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const savedPrompts = await response.json();
+
+            // Clear existing options and list items
+            systemPromptSelect.innerHTML = '';
+            savedPromptsList.innerHTML = '';
+
+            // Add default prompts to the select dropdown
+            defaultPrompts.forEach(prompt => {
+                const option = document.createElement('option');
+                option.value = prompt.content;
+                option.textContent = `Default: ${prompt.name}`;
+                systemPromptSelect.appendChild(option);
+            });
+
+            // Add saved prompts to the select dropdown and the management list
+            if (savedPrompts.length > 0) {
+                const savedPromptsOptGroup = document.createElement('optgroup');
+                savedPromptsOptGroup.label = 'Your Saved Prompts';
+                systemPromptSelect.appendChild(savedPromptsOptGroup);
+
+                savedPrompts.forEach(prompt => {
+                    // Add to select dropdown
+                    const option = document.createElement('option');
+                    option.value = prompt.content;
+                    option.textContent = `Custom: ${prompt.name}`;
+                    option.dataset.promptId = prompt.id; // Store ID for potential future use (e.g., editing)
+                    savedPromptsOptGroup.appendChild(option);
+
+                    // Add to saved prompts list for management
+                    const listItem = document.createElement('li');
+                    listItem.dataset.promptId = prompt.id;
+                    listItem.innerHTML = `<span>${prompt.name}</span><button class="delete-prompt-btn" data-id="${prompt.id}">&#128465;&#xfe0f;</button>`;
+                    
+                    // Add event listener for delete button
+                    const deleteBtn = listItem.querySelector('.delete-prompt-btn');
+                    deleteBtn.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        deletePrompt(prompt.id);
+                    });
+                    savedPromptsList.appendChild(listItem);
+                });
+            } else {
+                const noPromptItem = document.createElement('li');
+                noPromptItem.textContent = 'No custom prompts saved.';
+                savedPromptsList.appendChild(noPromptItem);
+            }
+
+        } catch (error) {
+            console.error('Error loading prompts:', error);
+            const errorItem = document.createElement('li');
+            errorItem.textContent = 'Error loading custom prompts.';
+            savedPromptsList.appendChild(errorItem);
+        }
+    }
+
+    // Function to save a new prompt
+    async function saveNewPrompt() {
+        const name = newPromptNameInput.value.trim();
+        const content = newPromptContentTextarea.value.trim();
+
+        if (!name || !content) {
+            displayMessage('ai', 'Please provide both a name and content for the new prompt.');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/prompts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, content }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`HTTP error! status: ${response.status}. Detail: ${errorData.detail}`);
+            }
+
+            const newPrompt = await response.json();
+            displayMessage('ai', `Prompt "${newPrompt.name}" saved successfully.`);
+            newPromptNameInput.value = '';
+            newPromptContentTextarea.value = '';
+            await loadPrompts(); // Reload prompts to show the new one
+        } catch (error) {
+            console.error('Error saving new prompt:', error);
+            displayMessage('ai', `Error saving prompt: ${error.message}.`);
+        }
+    }
+
+    // Function to delete a prompt
+    async function deletePrompt(promptId) {
+        if (!confirm('Are you sure you want to delete this prompt?')) {
+            return;
+        }
+        try {
+            const response = await fetch(`/api/prompts/${promptId}`, {
+                method: 'DELETE',
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            displayMessage('ai', `Prompt ${promptId} deleted.`);
+            await loadPrompts(); // Reload prompts list
+        } catch (error) {
+            console.error('Error deleting prompt:', error);
+            displayMessage('ai', 'Error deleting prompt. Please try again.');
+        }
+    }
+
     // Function to start a new conversation
     async function startNewConversation() {
-        const selectedPrompt = systemPromptSelect.value;
+        const selectedPromptContent = systemPromptSelect.value;
         const apiKey = geminiApiKeyInput.value.trim();
 
         if (!apiKey) {
@@ -145,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ system_prompt_used: selectedPrompt }),
+                body: JSON.stringify({ system_prompt_used: selectedPromptContent }),
             });
 
             if (!response.ok) {
@@ -155,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const conversation = await response.json();
             currentConversationId = conversation.id;
             chatWindow.innerHTML = ''; // Clear chat window for new conversation
-            displayMessage('ai', `New conversation started with prompt: "${selectedPrompt}"`);
+            displayMessage('ai', `New conversation started with prompt: "${systemPromptSelect.options[systemPromptSelect.selectedIndex].text}"`);
             console.log('New conversation started:', conversation);
             await loadConversations(); // Reload conversations to show the new one
             // Highlight the new conversation
@@ -244,8 +373,10 @@ document.addEventListener('DOMContentLoaded', () => {
             sendMessage();
         }
     });
+    savePromptBtn.addEventListener('click', saveNewPrompt);
 
     // Initial setup: Load past conversations and prompt the user
     loadConversations();
+    loadPrompts(); // Load prompts on startup
     displayMessage('ai', 'Welcome to PromptCraft AI Chat! Please enter your Gemini API Key, then choose a system prompt and click "Start New Conversation" to begin.');
 });

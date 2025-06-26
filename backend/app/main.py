@@ -7,7 +7,7 @@ from pathlib import Path # Import Path
 from backend.app import models
 from backend.app.database import engine
 from backend.app.api import chat # Import the chat router
-# from backend.app.api import prompts # Will be imported when prompts API is created
+from backend.app.api import prompts # Will be imported when prompts API is created
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -39,7 +39,7 @@ app.mount("/static", StaticFiles(directory=Path(__file__).parent.parent.parent /
 # Include API routers
 # This registers the endpoints defined in chat.py (and prompts.py when it's ready)
 app.include_router(chat.router, prefix="/api")
-# app.include_router(prompts.router, prefix="/api") # Uncomment when prompts API is ready
+app.include_router(prompts.router, prefix="/api") # Uncomment when prompts API is ready
 
 # Root endpoint to serve the frontend HTML
 @app.get("/", response_class=HTMLResponse, summary="Serve Frontend", description="Serves the main frontend HTML application.")

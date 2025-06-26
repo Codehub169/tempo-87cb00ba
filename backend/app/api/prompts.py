@@ -41,7 +41,7 @@ async def create_new_prompt(
     db: Session = Depends(get_db)
 ):
     """Endpoint to create a new prompt."""
-    db_prompt = crud.get_prompt_by_name(db, name=prompt.name)
+    db_prompt = crud.get_prompt_by_name(db, name=prompt.name);
     if db_prompt:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Prompt with this name already exists.")
     return crud.create_prompt(db=db, name=prompt.name, content=prompt.content)

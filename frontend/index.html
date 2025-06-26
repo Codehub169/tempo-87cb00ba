@@ -45,7 +45,7 @@
             border-radius: 12px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12); /* Softer, larger shadow */
             overflow: hidden;
-            min-height: 850px; /* Taller */
+            height: calc(100vh - 40px); /* Taller */
             margin: 20px;
         }
         .sidebar {
@@ -65,6 +65,7 @@
             flex-direction: column;
             padding: 25px;
             min-width: 500px; /* Ensure chat area is spacious */
+            height: 100%;
         }
         .header {
             text-align: center;
@@ -78,14 +79,16 @@
         }
         .api-key-input,
         .prompt-input-area,
-        .conversations-history {
+        .conversations-history,
+        .prompt-management-area {
             padding: 20px;
             border: 1px solid var(--neutral-border);
             border-radius: 10px;
             background-color: #ffffff;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Subtle inner shadow */
         }
-        .conversations-history h3 {
+        .conversations-history h3,
+        .prompt-management-area h3 {
             color: var(--primary-blue);
             margin-top: 0;
             margin-bottom: 15px;
@@ -93,14 +96,16 @@
             border-bottom: 1px solid var(--neutral-border);
             padding-bottom: 10px;
         }
-        #conversationsList {
+        #conversationsList,
+        #savedPromptsList {
             list-style: none;
             padding: 0;
             margin: 0;
-            max-height: 350px; /* Increased height */
+            max-height: 200px; /* Increased height */
             overflow-y: auto;
         }
-        #conversationsList li {
+        #conversationsList li,
+        #savedPromptsList li {
             padding: 12px 10px;
             border-bottom: 1px solid var(--neutral-border);
             cursor: pointer;
@@ -113,21 +118,25 @@
             position: relative;
             padding-right: 45px;
         }
-        #conversationsList li:hover {
+        #conversationsList li:hover,
+        #savedPromptsList li:hover {
             background-color: var(--hover-light);
             transform: translateY(-1px);
         }
-        #conversationsList li:last-child {
+        #conversationsList li:last-child,
+        #savedPromptsList li:last-child {
             border-bottom: none;
         }
-        #conversationsList li.active {
+        #conversationsList li.active,
+        #savedPromptsList li.active {
             background-color: var(--active-bg);
             font-weight: 600;
             color: var(--primary-blue);
             border-left: 4px solid var(--primary-blue);
             padding-left: 6px; /* Adjust padding due to border */
         }
-        .delete-conversation-btn {
+        .delete-conversation-btn,
+        .delete-prompt-btn {
             background: none;
             border: none;
             color: var(--delete-red);
@@ -142,7 +151,8 @@
             opacity: 0.7;
             transition: opacity 0.2s ease, color 0.2s ease;
         }
-        .delete-conversation-btn:hover {
+        .delete-conversation-btn:hover,
+        .delete-prompt-btn:hover {
             opacity: 1;
             color: var(--delete-red-hover);
         }
@@ -196,15 +206,17 @@
             transform: translateY(0);
             box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
         }
-        #newConversationBtn {
+        #newConversationBtn,
+        #savePromptBtn {
             background-color: var(--accent-green);
             box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
         }
-        #newConversationBtn:hover {
+        #newConversationBtn:hover,
+        #savePromptBtn:hover {
             background-color: '#43B069';
         }
         .chat-window {
-            flex-grow: 1;
+            flex: 1;
             border: 1px solid var(--neutral-border);
             border-radius: 10px;
             padding: 20px;
@@ -368,12 +380,24 @@
             <div class="prompt-input-area">
                 <label for="systemPromptSelect">Choose System Prompt:</label>
                 <select id="systemPromptSelect">
-                    <option value="You are a helpful AI assistant. Please format your responses using Markdown.">Default: Helpful AI Assistant</option>
-                    <option value="You are a creative writing assistant. Please format your responses using Markdown.">Creative Writing Assistant</option>
-                    <option value="You are a coding expert. Please format your responses using Markdown, especially for code blocks.">Coding Expert</option>
-                    <option value="You are a friendly chatbot that provides concise answers. Please format your responses using Markdown.">Concise Chatbot</option>
+                    <!-- Options will be dynamically loaded here, including defaults -->
                 </select>
                 <button id="newConversationBtn">Start New Conversation</button>
+            </div>
+
+            <div class="prompt-management-area conversations-history"> <!-- Reusing styling -->
+                <h3>Manage System Prompts</h3>
+                <label for="newPromptName">Prompt Name:</label>
+                <input type="text" id="newPromptName" placeholder="Enter a name for your prompt">
+
+                <label for="newPromptContent">Prompt Content:</label>
+                <textarea id="newPromptContent" rows="5" placeholder="Enter the system prompt content here..."></textarea>
+
+                <button id="savePromptBtn">Save New Prompt</button>
+
+                <ul id="savedPromptsList">
+                    <!-- Saved prompts will be listed here with edit/delete buttons -->
+                </ul>
             </div>
 
             <div class="conversations-history">
