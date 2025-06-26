@@ -259,6 +259,57 @@
             border-top-right-radius: 20px;
             border-bottom-right-radius: 20px;
         }
+        /* Markdown specific styling within messages */
+        .message.ai strong {
+            font-weight: bold;
+        }
+        .message.ai em {
+            font-style: italic;
+        }
+        .message.ai a {
+            color: var(--primary-blue);
+            text-decoration: underline;
+        }
+        .message.ai ul,
+        .message.ai ol {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            padding-left: 20px;
+        }
+        .message.ai li {
+            margin-bottom: 5px;
+        }
+        .message.ai pre {
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            padding: 10px;
+            overflow-x: auto;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            font-size: 0.9em;
+            color: #343a40;
+        }
+        .message.ai code {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            font-size: 0.85em;
+            background-color: rgba(27,31,35,.05);
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+        }
+        .message.ai pre code {
+            padding: 0;
+            background-color: transparent;
+        }
+        .message.ai blockquote {
+            border-left: 4px solid var(--neutral-border);
+            margin: 10px 0;
+            padding-left: 15px;
+            color: var(--medium-text);
+            font-style: italic;
+        }
+
         .input-area {
             display: flex;
             gap: 15px;
