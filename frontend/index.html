@@ -222,6 +222,7 @@
         }
         .chat-window {
             flex: 1;
+            height: 0; /* Added this line to ensure proper flex sizing */
             border: 1px solid var(--neutral-border);
             border-radius: 10px;
             padding: 20px;
@@ -232,7 +233,7 @@
             flex-direction: column;
             gap: 15px;
             box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.03);
-            min-height: 0; /* Ensures the flex item can shrink and its overflow applies */
+            min-height: 0;
         }
         .message {
             padding: 12px 18px;
