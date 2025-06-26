@@ -29,27 +29,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Function to display a message in the chat window
-    function displayMessage(sender, content, timestamp = null, isStreaming = false) {
+    function displayMessage(sender, content, timestamp = null) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message', sender);
-        messageElement.dataset.timestamp = timestamp; // Store timestamp for potential re-rendering
 
-        if (isStreaming) {
-            // For streaming, we'll append text directly and mark it for later markdown parsing
-            messageElement.innerHTML = content; // Append raw text
-            messageElement.classList.add('streaming'); // Mark as streaming message
-        } else {
-            // Apply markdown formatting for AI messages when not streaming or when stream finishes
-            if (sender === 'ai') {
-                if (typeof marked !== 'undefined') {
-                    messageElement.innerHTML = marked.parse(content);
-                } else {
-                    console.warn('marked.js not loaded. AI message displayed as plain text.');
-                    messageElement.textContent = content;
-                }
+        // Apply markdown formatting for AI messages
+        if (sender === 'ai') {
+            // Ensure marked.js is loaded before attempting to parse
+            if (typeof marked !== 'undefined') {
+                messageElement.innerHTML = marked.parse(content);
             } else {
+                console.warn('marked.js not loaded. AI message displayed as plain text.');
                 messageElement.textContent = content;
             }
+        } else {
+            messageElement.textContent = content;
         }
 
         if (timestamp) {
@@ -61,7 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         chatWindow.appendChild(messageElement);
         chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to bottom
-        return messageElement; // Return the created element for streaming updates
     }
 
     // Function to fetch and display messages for a conversation
@@ -327,8 +320,6 @@ document.addEventListener('DOMContentLoaded', () => {
         displayMessage('user', messageContent, new Date().toISOString()); // Display user message immediately
         userMessageInput.value = ''; // Clear input field
 
-        const aiMessageElement = displayMessage('ai', '', new Date().toISOString(), true); // Create element for streaming
-
         try {
             const response = await fetch(`/api/conversation/${currentConversationId}/send_message`, {
                 method: 'POST',
@@ -342,34 +333,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            // Read the stream
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let aiFullResponseContent = '';
-
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) {
-                    break;
-                }
-                const chunk = decoder.decode(value, { stream: true });
-                aiFullResponseContent += chunk;
-                // Update the AI message element with the new chunk
-                aiMessageElement.innerHTML = marked.parse(aiFullResponseContent); // Re-parse markdown with each chunk
-                chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to bottom
-            }
-            
-            // After streaming is complete, remove the streaming class and ensure final markdown parsing
-            aiMessageElement.classList.remove('streaming');
-            aiMessageElement.innerHTML = marked.parse(aiFullResponseContent);
-            
-            // (Optional) If you want to force a reload of messages after AI response, enable this:
-            // await fetchMessages(currentConversationId); 
-
+            const aiMessage = await response.json();
+            displayMessage('ai', aiMessage.content, aiMessage.timestamp);
         } catch (error) {
             console.error('Error sending message or getting AI response:', error);
-            aiMessageElement.textContent = 'Error getting AI response. Please try again.'; // Update error in the message element
-            aiMessageElement.classList.remove('streaming');
+            displayMessage('ai', 'Error getting AI response. Please try again.');
         }
     }
 
