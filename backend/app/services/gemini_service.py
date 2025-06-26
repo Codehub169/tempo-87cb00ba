@@ -12,8 +12,9 @@ async def generate_gemini_response(api_key: str, system_prompt: str, chat_histor
 
     gemini_history = []
     for msg in chat_history:
-        role = 'user' if msg['role'] == 'user' else 'model'
-        gemini_history.append({'role': role, 'parts': [msg['content']]}) # Ensure content is in a list for parts
+        # Corrected: Access attributes using dot notation, not dictionary keys
+        role = 'user' if msg.sender == 'user' else 'model'
+        gemini_history.append({'role': role, 'parts': [msg.content]}) # Ensure content is in a list for parts
 
     try:
         # Start a chat session with the prepared history
