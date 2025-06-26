@@ -2,10 +2,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatWindow = document.getElementById('chatWindow');
     const userMessageInput = document.getElementById('userMessageInput');
     const sendMessageBtn = document.getElementById('sendMessageBtn');
-    const systemPromptSelect = document.getElementById('systemPromptSelect'); // Corrected ID
+    const systemPromptSelect = document.getElementById('systemPromptSelect');
     const newConversationBtn = document.getElementById('newConversationBtn');
     const geminiApiKeyInput = document.getElementById('geminiApiKey');
-    const conversationsList = document.getElementById('conversationsList'); // New: Get conversations list element
+    const conversationsList = document.getElementById('conversationsList');
 
     let currentConversationId = null;
 
@@ -19,7 +19,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayMessage(sender, content, timestamp = null) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message', sender);
-        messageElement.textContent = content;
+
+        // Apply markdown formatting for AI messages
+        if (sender === 'ai') {
+            // Ensure marked.js is loaded before attempting to parse
+            if (typeof marked !== 'undefined') {
+                messageElement.innerHTML = marked.parse(content);
+            } else {
+                console.warn('marked.js not loaded. AI message displayed as plain text.');
+                messageElement.textContent = content;
+            }
+        } else {
+            messageElement.textContent = content;
+        }
 
         if (timestamp) {
             const timestampElement = document.createElement('span');
@@ -80,8 +92,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 listItem.dataset.conversationId = convo.id; // Store ID for easy access
                 const promptSnippet = convo.system_prompt_used.substring(0, 30) + '...';
                 const date = new Date(convo.created_at).toLocaleDateString();
-                listItem.innerHTML = `<span>${promptSnippet}</span><span style="font-size:0.8em; color:#888;">${date}</span>`;
-                listItem.addEventListener('click', () => fetchMessages(convo.id));
+                // Add delete button
+                listItem.innerHTML = `<span>${promptSnippet}</span><span style="font-size:0.8em; color:#888;">${date}</span><button class="delete-conversation-btn" data-id="${convo.id}">🗑️</button>`;
+                
+                listItem.addEventListener('click', (event) => {
+                    // Only fetch messages if the click wasn't on the delete button
+                    if (!event.target.classList.contains('delete-conversation-btn')) {
+                        fetchMessages(convo.id);
+                    }
+                });
+
+                // Add event listener for the delete button
+                const deleteBtn = listItem.querySelector('.delete-conversation-btn');
+                deleteBtn.addEventListener('click', (event) => {
+                    event.stopPropagation(); // Prevent the parent <li>'s click event
+                    deleteConversation(convo.id);
+                });
+
                 conversationsList.appendChild(listItem);
             });
 
@@ -181,6 +208,31 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error sending message or getting AI response:', error);
             displayMessage('ai', 'Error getting AI response. Please try again.');
+        }
+    }
+
+    // New function to delete a conversation
+    async function deleteConversation(conversationId) {
+        if (!confirm('Are you sure you want to delete this conversation? This action cannot be undone.')) {
+            return;
+        }
+        try {
+            const response = await fetch(`/api/conversation/${conversationId}`, {
+                method: 'DELETE',
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            displayMessage('ai', `Conversation ${conversationId} deleted.`);
+            if (currentConversationId === conversationId) {
+                currentConversationId = null;
+                chatWindow.innerHTML = ''; // Clear chat window
+                displayMessage('ai', 'Conversation deleted. Please start a new conversation.');
+            }
+            await loadConversations(); // Reload conversations list
+        } catch (error) {
+            console.error('Error deleting conversation:', error);
+            displayMessage('ai', 'Error deleting conversation. Please try again.');
         }
     }
 
