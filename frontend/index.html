@@ -190,7 +190,7 @@
             box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
         }
         button:hover {
-            background-color: #3A7BBF; /* Darker shade of primary blue */
+            background-color: '#3A7BBF'; /* Darker shade of primary blue */
             transform: translateY(-2px);
         }
         button:active {
@@ -202,7 +202,7 @@
             box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
         }
         #newConversationBtn:hover {
-            background-color: #43B069;
+            background-color: '#43B069';
         }
         .chat-window {
             flex-grow: 1;
@@ -369,10 +369,10 @@
             <div class="prompt-input-area">
                 <label for="systemPromptSelect">Choose System Prompt:</label>
                 <select id="systemPromptSelect">
-                    <option value="You are a helpful AI assistant.">Default: Helpful AI Assistant</option>
-                    <option value="You are a creative writing assistant.">Creative Writing Assistant</option>
-                    <option value="You are a coding expert.">Coding Expert</option>
-                    <option value="You are a friendly chatbot that provides concise answers.">Concise Chatbot</option>
+                    <option value="You are a helpful AI assistant. Please format your responses using Markdown.">Default: Helpful AI Assistant</option>
+                    <option value="You are a creative writing assistant. Please format your responses using Markdown.">Creative Writing Assistant</option>
+                    <option value="You are a coding expert. Please format your responses using Markdown, especially for code blocks.">Coding Expert</option>
+                    <option value="You are a friendly chatbot that provides concise answers. Please format your responses using Markdown.">Concise Chatbot</option>
                 </select>
                 <button id="newConversationBtn">Start New Conversation</button>
             </div>
