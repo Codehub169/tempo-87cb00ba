@@ -25,6 +25,8 @@ body {
     --active-bg: #d2e3fc;
     --delete-red: #dc3545;
     --delete-red-hover: #c82333;
+    --feedback-active: #28a745; /* Green for active like */
+    --feedback-dislike-active: #dc3545; /* Red for active dislike */
 
     /* Dark Mode Variables */
     --dark-mode-bg: #202124;
@@ -37,6 +39,8 @@ body {
     --dark-mode-chat-ai-bg: #3a475a; /* Darker blue tint for AI messages in dark mode */
     --dark-mode-hover-light: #424242;
     --dark-mode-active-bg: #1a73e8; /* Keep primary blue for active highlight */
+    --dark-mode-feedback-active: #28a745; /* Green for active like */
+    --dark-mode-feedback-dislike-active: #dc3545; /* Red for active dislike */
 }
 
 /* Apply border-box globally for easier layout calculations */
@@ -355,6 +359,58 @@ body.dark-mode .message.ai {
 
 body.dark-mode .message .timestamp {
     color: var(--dark-mode-medium-text);
+}
+
+/* Feedback buttons for AI messages */
+.feedback-container {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    justify-content: flex-end; /* Align buttons to the right within user message bubble */
+}
+
+.message.ai .feedback-container {
+    justify-content: flex-start; /* Align buttons to the left within AI message bubble */
+}
+
+.feedback-btn {
+    background-color: #ccc; /* Default grey */
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.feedback-btn:hover {
+    background-color: #b0b0b0;
+    transform: translateY(-1px);
+}
+
+.feedback-btn.active {
+    background-color: var(--feedback-active);
+}
+
+.feedback-btn.dislike-btn.active {
+    background-color: var(--feedback-dislike-active);
+}
+
+body.dark-mode .feedback-btn {
+    background-color: #555;
+}
+
+body.dark-mode .feedback-btn:hover {
+    background-color: #666;
+}
+
+body.dark-mode .feedback-btn.active {
+    background-color: var(--dark-mode-feedback-active);
+}
+
+body.dark-mode .feedback-btn.dislike-btn.active {
+    background-color: var(--dark-mode-feedback-dislike-active);
 }
 
 /* Markdown specific styles */

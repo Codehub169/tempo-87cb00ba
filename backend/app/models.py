@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -39,6 +39,8 @@ class Message(Base):
     sender = Column(String, nullable=False) # 'user' or 'ai'
     content = Column(Text, nullable=False) # The message content
     timestamp = Column(DateTime(timezone=True), server_default=func.now()) # Timestamp of message creation
+    liked = Column(Boolean, default=False) # New field for like status
+    disliked = Column(Boolean, default=False) # New field for dislike status
 
     # Relationship to Conversation: A message belongs to one conversation.
     conversation = relationship("Conversation", back_populates="messages")
