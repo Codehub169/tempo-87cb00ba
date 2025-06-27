@@ -147,7 +147,8 @@ body {
       #conversationsList,
       #savedPromptsList {
           list-style: none;
-          padding: 0;\n    margin: 0;
+          padding: 0;
+          margin: 0;
           max-height: 200px; /* Increased height */
           overflow-y: auto;
       }
@@ -164,6 +165,12 @@ body {
           align-items: center;
           position: relative;
           padding-right: 50px; /* Adjusted padding for new button size */
+      }
+
+      .date-span {
+          font-size: 0.8em;
+          white-space: nowrap;
+          margin-left: 1rem;
       }
 
       body.dark-mode #conversationsList li,
@@ -202,8 +209,7 @@ body {
           color: var(--primary-blue); /* Keep primary blue for active highlight */
       }
 
-      .delete-conversation-btn,
-      .delete-prompt-btn {
+      .delete-btn {
           background-color: var(--delete-red); /* Solid background for button */
           border: none;
           color: white; /* White icon color */
@@ -224,20 +230,20 @@ body {
           transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
           box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
       }
-      .delete-conversation-btn:hover,
-      .delete-prompt-btn:hover {
+      .delete-btn:hover {
           background-color: var(--delete-red-hover); /* Darker red on hover */
           opacity: 1;
           transform: translateY(-50%) scale(1.05); /* Slight scale on hover */
           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* More pronounced shadow on hover */
       }
-      label {\n    display: block;
+      label {
+          display: block;
           margin-bottom: 10px;
           font-weight: 600;
           color: var(--primary-blue);
           font-size: 1.05em;
       }
-      input[type="text"],
+      input[type=\"text\"],
       textarea,
       select {
           width: calc(100% - 20px); /* Account for padding */
@@ -251,7 +257,7 @@ body {
           transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
       }
 
-      body.dark-mode input[type="text"],
+      body.dark-mode input[type=\"text\"],
       body.dark-mode textarea,
       body.dark-mode select {
           background-color: var(--dark-mode-bg);
@@ -259,7 +265,7 @@ body {
           color: var(--dark-mode-text-color);
       }
 
-      input[type="text"]:focus,
+      input[type=\"text\"]:focus,
       textarea:focus,
       select:focus {
           border-color: var(--primary-blue);
@@ -453,7 +459,7 @@ body {
           flex-shrink: 0;
       }
 
-      .input-area input[type="text"] {
+      .input-area input[type=\"text\"] {
           flex: 1;
           margin-bottom: 0; /* Override default margin */
       }

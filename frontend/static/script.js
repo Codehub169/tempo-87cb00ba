@@ -39,21 +39,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Apply markdown formatting for AI messages
+        const contentContainer = document.createElement('div');
         if (sender === 'ai') {
             // Ensure marked.js is loaded before attempting to parse
             if (typeof marked !== 'undefined') {
-                messageElement.innerHTML = marked.parse(content);
+                contentContainer.innerHTML = marked.parse(content);
             } else {
                 console.warn('marked.js not loaded. AI message displayed as plain text.');
-                const contentNode = document.createElement('div');
-                contentNode.textContent = content;
-                messageElement.appendChild(contentNode);
+                contentContainer.textContent = content;
             }
         } else {
-            const contentNode = document.createElement('div');
-            contentNode.textContent = content;
-            messageElement.appendChild(contentNode);
+            contentContainer.textContent = content;
         }
+        messageElement.appendChild(contentContainer);
 
         if (timestamp) {
             const timestampElement = document.createElement('span');
@@ -184,9 +182,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 listItem.addEventListener('click', (event) => {
                     // Only fetch messages if the click wasn't on the delete button
-                    if (!event.target.classList.contains('delete-btn')) {
-                        fetchMessages(convo.id);
-                    }
+                    if (event.target.closest('.delete-btn')) return;
+                    fetchMessages(convo.id);
                 });
 
                 // Add event listener for the delete button
@@ -202,6 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // If there's an active conversation, highlight it
             if (currentConversationId) {
                 document.querySelectorAll('#conversationsList li').forEach(item => {
+                    item.classList.remove('active');
                     if (parseInt(item.dataset.conversationId) === currentConversationId) {
                         item.classList.add('active');
                     }
