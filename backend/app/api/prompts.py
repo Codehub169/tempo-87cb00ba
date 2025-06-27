@@ -27,7 +27,7 @@ class PromptResponse(PromptBase):
     created_at: datetime.datetime
 
     class Config:
-        orm_mode = True # Enable ORM mode for Pydantic
+        from_attributes = True # Enable ORM mode for Pydantic
 
 @router.post(
     "/prompts",
@@ -89,6 +89,12 @@ async def update_existing_prompt(
     db: Session = Depends(get_db)
 ):
     """Endpoint to update an existing prompt."""
+    # Check if a prompt with the new name already exists (if name is being updated)
+    if prompt.name:
+        existing_prompt = crud.get_prompt_by_name(db, name=prompt.name)
+        if existing_prompt and existing_prompt.id != prompt_id:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Prompt with this name already exists.")
+
     db_prompt = crud.update_prompt(db, prompt_id=prompt_id, name=prompt.name, content=prompt.content)
     if not db_prompt:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Prompt not found.")

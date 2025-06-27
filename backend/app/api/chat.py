@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import List, Optional
-import datetime # Import datetime
+import datetime
 
 from backend.app import crud, models
 from backend.app.database import get_db
@@ -23,9 +23,11 @@ class MessageResponse(MessageBase):
     conversation_id: int
     sender: str
     timestamp: datetime.datetime
+    liked: bool
+    disliked: bool
 
     class Config:
-        orm_mode = True # Enable ORM mode for Pydantic
+        from_attributes = True # Enable ORM mode for Pydantic
 
 class ConversationBase(BaseModel):
     system_prompt_used: str
@@ -39,11 +41,15 @@ class ConversationResponse(ConversationBase):
     messages: List[MessageResponse] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UserMessageRequest(BaseModel):
     message_content: str
     api_key: str # Add api_key field
+
+class MessageFeedbackRequest(BaseModel):
+    liked: Optional[bool] = None
+    disliked: Optional[bool] = None
 
 
 @router.post(
@@ -77,11 +83,14 @@ async def get_conversation_messages(
     db: Session = Depends(get_db)
 ):
     """Endpoint to retrieve messages for a conversation."""
+    # First, check if conversation exists
+    db_conversation = crud.get_conversation(db, conversation_id)
+    if not db_conversation:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found.")
+
     messages = crud.get_messages_for_conversation(
         db=db, conversation_id=conversation_id, skip=skip, limit=limit
     )
-    if not messages and not crud.get_conversation(db, conversation_id):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found.")
     return messages
 
 
@@ -130,14 +139,15 @@ async def send_user_message_and_get_ai_response(
     ]
 
     # 3. Get AI response
-    # The last message in chat_history_for_gemini is the current user message, which should be passed as user_message.
-    # The chat_history for the model should be everything *before* the current user message.
-    ai_response_content = await generate_gemini_response(
-        api_key=user_message_req.api_key, # Pass the API key
-        system_prompt=db_conversation.system_prompt_used,
-        chat_history=chat_history_for_gemini[:-1], # Pass history *before* current user message
-        user_message=user_message_req.message_content
-    )
+    try:
+        ai_response_content = await generate_gemini_response(
+            api_key=user_message_req.api_key, # Pass the API key
+            system_prompt=db_conversation.system_prompt_used,
+            chat_history=chat_history_for_gemini[:-1], # Pass history *before* current user message
+            user_message=user_message_req.message_content
+        )
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
     # 4. Save AI message
     db_ai_message = crud.create_message(
@@ -145,6 +155,33 @@ async def send_user_message_and_get_ai_response(
     )
 
     return db_ai_message
+
+
+@router.put(
+    "/message/{message_id}/feedback",
+    response_model=MessageResponse,
+    summary="Add feedback to a message",
+    description="Allows a user to like or dislike an AI message."
+)
+async def update_message_feedback_endpoint(
+    message_id: int,
+    feedback: MessageFeedbackRequest,
+    db: Session = Depends(get_db)
+):
+    """Endpoint to update message feedback."""
+    db_message_check = db.query(models.Message).filter(models.Message.id == message_id).first()
+    if not db_message_check:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Message not found.")
+    if db_message_check.sender != 'ai':
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Feedback can only be provided for AI messages.")
+    
+    db_message = crud.update_message_feedback(
+        db, message_id=message_id, liked=feedback.liked, disliked=feedback.disliked
+    )
+    if not db_message:
+        # This case should ideally not be hit if the check above passes, but it's good practice
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Message not found during update.")
+    return db_message
 
 
 @router.delete(

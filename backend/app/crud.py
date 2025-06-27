@@ -62,7 +62,7 @@ def get_conversation(db: Session, conversation_id: int):
 
 def get_conversations(db: Session, skip: int = 0, limit: int = 100):
     """Retrieves a list of conversations with pagination."""
-    return db.query(Conversation).offset(skip).limit(limit).all()
+    return db.query(Conversation).order_by(Conversation.created_at.desc()).offset(skip).limit(limit).all()
 
 def delete_conversation(db: Session, conversation_id: int):
     """Deletes a conversation by its ID. Returns True if deleted, False otherwise."""
@@ -85,7 +85,7 @@ def create_message(db: Session, conversation_id: int, sender: str, content: str)
 
 def get_messages_for_conversation(db: Session, conversation_id: int, skip: int = 0, limit: int = 100):
     """Retrieves messages for a specific conversation with pagination."""
-    return db.query(Message).filter(Message.conversation_id == conversation_id).offset(skip).limit(limit).all()
+    return db.query(Message).filter(Message.conversation_id == conversation_id).order_by(Message.timestamp.asc()).offset(skip).limit(limit).all()
 
 def update_message_feedback(db: Session, message_id: int, liked: bool = None, disliked: bool = None):
     """Updates the liked/disliked status of a message."""

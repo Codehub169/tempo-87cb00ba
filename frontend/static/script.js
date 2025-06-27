@@ -29,9 +29,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Function to display a message in the chat window
-    function displayMessage(sender, content, timestamp = null) {
+    function displayMessage(message) {
+        const { sender, content, timestamp, id, liked, disliked } = message;
+
         const messageElement = document.createElement('div');
         messageElement.classList.add('message', sender);
+        if (id) {
+            messageElement.dataset.messageId = id;
+        }
 
         // Apply markdown formatting for AI messages
         if (sender === 'ai') {
@@ -40,10 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 messageElement.innerHTML = marked.parse(content);
             } else {
                 console.warn('marked.js not loaded. AI message displayed as plain text.');
-                messageElement.textContent = content;
+                const contentNode = document.createElement('div');
+                contentNode.textContent = content;
+                messageElement.appendChild(contentNode);
             }
         } else {
-            messageElement.textContent = content;
+            const contentNode = document.createElement('div');
+            contentNode.textContent = content;
+            messageElement.appendChild(contentNode);
         }
 
         if (timestamp) {
@@ -53,8 +62,73 @@ document.addEventListener('DOMContentLoaded', () => {
             messageElement.appendChild(timestampElement);
         }
 
+        // Add feedback buttons for AI messages that have an ID
+        if (sender === 'ai' && id) {
+            const feedbackContainer = document.createElement('div');
+            feedbackContainer.classList.add('feedback-container');
+
+            const likeBtn = document.createElement('button');
+            likeBtn.classList.add('feedback-btn', 'like-btn');
+            if (liked) likeBtn.classList.add('active');
+            likeBtn.innerHTML = '👍';
+            likeBtn.addEventListener('click', () => handleFeedback(id, 'like'));
+
+            const dislikeBtn = document.createElement('button');
+            dislikeBtn.classList.add('feedback-btn', 'dislike-btn');
+            if (disliked) dislikeBtn.classList.add('active');
+            dislikeBtn.innerHTML = '👎';
+            dislikeBtn.addEventListener('click', () => handleFeedback(id, 'dislike'));
+
+            feedbackContainer.appendChild(likeBtn);
+            feedbackContainer.appendChild(dislikeBtn);
+            messageElement.appendChild(feedbackContainer);
+        }
+
         chatWindow.appendChild(messageElement);
         chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to bottom
+    }
+
+    // Function to handle message feedback (like/dislike)
+    async function handleFeedback(messageId, feedbackType) {
+        const messageElement = document.querySelector(`.message[data-message-id='${messageId}']`);
+        if (!messageElement) return;
+
+        const likeBtn = messageElement.querySelector('.like-btn');
+        const dislikeBtn = messageElement.querySelector('.dislike-btn');
+
+        let newLikedState = false;
+        let newDislikedState = false;
+
+        // Determine the new state based on which button was clicked
+        if (feedbackType === 'like') {
+            // Toggle like: if it's already active, we're un-liking it. Otherwise, we're liking it.
+            newLikedState = !likeBtn.classList.contains('active');
+        } else if (feedbackType === 'dislike') {
+            // Toggle dislike
+            newDislikedState = !dislikeBtn.classList.contains('active');
+        }
+
+        try {
+            const response = await fetch(`/api/message/${messageId}/feedback`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ liked: newLikedState, disliked: newDislikedState }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to submit feedback.');
+            }
+
+            const updatedMessage = await response.json();
+
+            // Update UI based on the authoritative response from the server
+            likeBtn.classList.toggle('active', updatedMessage.liked);
+            dislikeBtn.classList.toggle('active', updatedMessage.disliked);
+
+        } catch (error) {
+            console.error('Error submitting feedback:', error);
+            displayMessage({ sender: 'ai', content: 'Could not save feedback. Please try again.' });
+        }
     }
 
     // Function to fetch and display messages for a conversation
@@ -67,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const messages = await response.json();
             chatWindow.innerHTML = ''; // Clear existing messages
             messages.forEach(msg => {
-                displayMessage(msg.sender, msg.content, msg.timestamp);
+                displayMessage(msg);
             });
             currentConversationId = conversationId; // Set current conversation
             // Highlight the active conversation in the sidebar
@@ -77,10 +151,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     item.classList.add('active');
                 }
             });
-            displayMessage('ai', `Loaded conversation.`);
+            displayMessage({ sender: 'ai', content: `Loaded conversation.`});
         } catch (error) {
             console.error('Error fetching messages:', error);
-            displayMessage('ai', 'Error loading messages. Please try starting a new conversation.');
+            displayMessage({ sender: 'ai', content: 'Error loading messages. Please try starting a new conversation.'});
         }
     }
 
@@ -106,17 +180,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const promptSnippet = convo.system_prompt_used.substring(0, 30) + '...';
                 const date = new Date(convo.created_at).toLocaleDateString();
                 // Add delete button
-                listItem.innerHTML = `<span>${promptSnippet}</span><span style="font-size:0.8em; color:#888;">${date}</span><button class="delete-conversation-btn" data-id="${convo.id}">&#128465;&#xfe0f;</button>`;
+                listItem.innerHTML = `<span>${promptSnippet}</span><span class=\"date-span\">${date}</span><button class=\"delete-btn\" data-id=\"${convo.id}\">🗑️</button>`;
 
                 listItem.addEventListener('click', (event) => {
                     // Only fetch messages if the click wasn't on the delete button
-                    if (!event.target.classList.contains('delete-conversation-btn')) {
+                    if (!event.target.classList.contains('delete-btn')) {
                         fetchMessages(convo.id);
                     }
                 });
 
                 // Add event listener for the delete button
-                const deleteBtn = listItem.querySelector('.delete-conversation-btn');
+                const deleteBtn = listItem.querySelector('.delete-btn');
                 deleteBtn.addEventListener('click', (event) => {
                     event.stopPropagation(); // Prevent the parent <li>'s click event
                     deleteConversation(convo.id);
@@ -173,17 +247,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Add to select dropdown
                     const option = document.createElement('option');
                     option.value = prompt.content;
-                    option.textContent = `Custom: ${prompt.name}`;
+                    option.textContent = `${prompt.name}`;
                     option.dataset.promptId = prompt.id; // Store ID for potential future use (e.g., editing)
                     savedPromptsOptGroup.appendChild(option);
 
                     // Add to saved prompts list for management
                     const listItem = document.createElement('li');
                     listItem.dataset.promptId = prompt.id;
-                    listItem.innerHTML = `<span>${prompt.name}</span><button class="delete-prompt-btn" data-id="${prompt.id}">&#128465;&#xfe0f;</button>`;
+                    listItem.innerHTML = `<span>${prompt.name}</span><button class=\"delete-btn\" data-id=\"${prompt.id}\">🗑️</button>`;
                     
                     // Add event listener for delete button
-                    const deleteBtn = listItem.querySelector('.delete-prompt-btn');
+                    const deleteBtn = listItem.querySelector('.delete-btn');
                     deleteBtn.addEventListener('click', (event) => {
                         event.stopPropagation();
                         deletePrompt(prompt.id);
@@ -201,6 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const errorItem = document.createElement('li');
             errorItem.textContent = 'Error loading custom prompts.';
             savedPromptsList.appendChild(errorItem);
+            systemPromptSelect.innerHTML = '<option>Error loading prompts</option>';
         }
     }
 
@@ -210,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const content = newPromptContentTextarea.value.trim();
 
         if (!name || !content) {
-            displayMessage('ai', 'Please provide both a name and content for the new prompt.');
+            displayMessage({ sender: 'ai', content: 'Please provide both a name and content for the new prompt.' });
             return;
         }
 
@@ -225,17 +300,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(`HTTP error! status: ${response.status}. Detail: ${errorData.detail}`);
+                throw new Error(`HTTP error! status: ${response.status}. Detail: ${errorData.detail || 'Unknown error'}`);
             }
 
             const newPrompt = await response.json();
-            displayMessage('ai', `Prompt "${newPrompt.name}" saved successfully.`);
+            displayMessage({ sender: 'ai', content: `Prompt \"${newPrompt.name}\" saved successfully.` });
             newPromptNameInput.value = '';
             newPromptContentTextarea.value = '';
             await loadPrompts(); // Reload prompts to show the new one
         } catch (error) {
             console.error('Error saving new prompt:', error);
-            displayMessage('ai', `Error saving prompt: ${error.message}.`);
+            displayMessage({ sender: 'ai', content: `Error saving prompt: ${error.message}.` });
         }
     }
 
@@ -251,11 +326,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            displayMessage('ai', `Prompt ${promptId} deleted.`);
+            displayMessage({ sender: 'ai', content: `Prompt deleted.` });
             await loadPrompts(); // Reload prompts list
         } catch (error) {
             console.error('Error deleting prompt:', error);
-            displayMessage('ai', 'Error deleting prompt. Please try again.');
+            displayMessage({ sender: 'ai', content: 'Error deleting prompt. Please try again.' });
         }
     }
 
@@ -265,7 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const apiKey = geminiApiKeyInput.value.trim();
 
         if (!apiKey) {
-            displayMessage('ai', 'Please enter your Gemini API Key before starting a new conversation.');
+            displayMessage({ sender: 'ai', content: 'Please enter your Gemini API Key before starting a new conversation.' });
             return;
         }
 
@@ -285,20 +360,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const conversation = await response.json();
             currentConversationId = conversation.id;
             chatWindow.innerHTML = ''; // Clear chat window for new conversation
-            displayMessage('ai', `New conversation started with prompt: "${systemPromptSelect.options[systemPromptSelect.selectedIndex].text}"`);
+            displayMessage({ sender: 'ai', content: `New conversation started with prompt: \"${systemPromptSelect.options[systemPromptSelect.selectedIndex].text}\"` });
             console.log('New conversation started:', conversation);
             await loadConversations(); // Reload conversations to show the new one
-            // Highlight the new conversation
-            document.querySelectorAll('#conversationsList li').forEach(item => {
-                item.classList.remove('active');
-                if (parseInt(item.dataset.conversationId) === currentConversationId) {
-                    item.classList.add('active');
-                }
-            });
 
         } catch (error) {
             console.error('Error starting new conversation:', error);
-            displayMessage('ai', 'Error starting new conversation. Please try again.');
+            displayMessage({ sender: 'ai', content: 'Error starting new conversation. Please try again.' });
         }
     }
 
@@ -309,15 +377,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!messageContent) return;
         if (currentConversationId === null) {
-            displayMessage('ai', 'Please start a new conversation first.');
+            displayMessage({ sender: 'ai', content: 'Please start a new conversation first.' });
             return;
         }
         if (!apiKey) {
-            displayMessage('ai', 'Please enter your Gemini API Key before sending a message.');
+            displayMessage({ sender: 'ai', content: 'Please enter your Gemini API Key before sending a message.' });
             return;
         }
 
-        displayMessage('user', messageContent, new Date().toISOString()); // Display user message immediately
+        displayMessage({ sender: 'user', content: messageContent, timestamp: new Date().toISOString() }); // Display user message immediately
         userMessageInput.value = ''; // Clear input field
 
         try {
@@ -330,14 +398,15 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                 const errorData = await response.json();
+                throw new Error(`HTTP error! status: ${response.status}. Detail: ${errorData.detail || 'Failed to get AI response.'}`);
             }
 
             const aiMessage = await response.json();
-            displayMessage('ai', aiMessage.content, aiMessage.timestamp);
+            displayMessage(aiMessage);
         } catch (error) {
             console.error('Error sending message or getting AI response:', error);
-            displayMessage('ai', 'Error getting AI response. Please try again.');
+            displayMessage({ sender: 'ai', content: `Error: ${error.message}` });
         }
     }
 
@@ -353,16 +422,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            displayMessage('ai', `Conversation ${conversationId} deleted.`);
+            displayMessage({ sender: 'ai', content: `Conversation deleted.` });
             if (currentConversationId === conversationId) {
                 currentConversationId = null;
                 chatWindow.innerHTML = ''; // Clear chat window
-                displayMessage('ai', 'Conversation deleted. Please start a new conversation.');
+                displayMessage({ sender: 'ai', content: 'Conversation deleted. Please start a new conversation.' });
             }
             await loadConversations(); // Reload conversations list
         } catch (error) {
             console.error('Error deleting conversation:', error);
-            displayMessage('ai', 'Error deleting conversation. Please try again.');
+            displayMessage({ sender: 'ai', content: 'Error deleting conversation. Please try again.' });
         }
     }
 
@@ -409,5 +478,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial setup: Load past conversations and prompt the user
     loadConversations();
     loadPrompts(); // Load prompts on startup
-    displayMessage('ai', 'Welcome to PromptCraft AI Chat! Please enter your Gemini API Key, then choose a system prompt and click "Start New Conversation" to begin.');
+    displayMessage({ sender: 'ai', content: 'Welcome to PromptCraft AI Chat! Please enter your Gemini API Key, then choose a system prompt and click \"Start New Conversation\" to begin.' });
 });
