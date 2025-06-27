@@ -1,476 +1,474 @@
 body {
-    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f0f2f5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    color: #333;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    overflow: hidden; /* Prevent body scroll, main-wrapper will scroll */
-    
-    /* Define CSS Variables for theming */
-    --primary-blue: #1a73e8;
-    --secondary-blue: #34a853;
-    --light-bg: #f5f7fa;
-    --dark-bg: #e8eff6;
-    --neutral-border: #dce1e6;
-    --text-color: #202124;
-    --medium-text: #5f6368;
-    --chat-user-bg: #e6f4ea; /* Light green tint for user messages */
-    --chat-ai-bg: #e8f0fe; /* Light blue tint for AI messages */
-    --hover-light: #e8f0fe;
-    --active-bg: #d2e3fc;
-    --delete-red: #dc3545;
-    --delete-red-hover: #c82333;
-    --feedback-active: #28a745; /* Green for active like */
-    --feedback-dislike-active: #dc3545; /* Red for active dislike */
+          font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+          margin: 0;
+          padding: 0;
+          background-color: #f0f2f5;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          color: #333;
+          transition: background-color 0.3s ease, color 0.3s ease;
+          overflow: hidden; /* Prevent body scroll, main-wrapper will scroll */
+          
+          /* Define CSS Variables for theming - Rustic Theme */
+          --primary-blue: #4A6D5E; /* Muted forest green */
+          --secondary-blue: #B88B7A; /* Warm terracotta */
+          --light-bg: #FDF8F0; /* Creamy off-white */
+          --dark-bg: #EDE4D7; /* Slightly darker beige for code blocks */
+          --neutral-border: #C4B29E; /* Muted medium brown/grey */
+          --text-color: #3A332C; /* Dark brown/charcoal */
+          --medium-text: #7F776B; /* Muted grey-brown */
+          --chat-user-bg: #EFEADF; /* Light, warm green-beige for user messages */
+          --chat-ai-bg: #E3E8EC; /* Light, warm grey-blue for AI messages */
+          --hover-light: #F5EFDF; /* Slightly darker version of light-bg */
+          --active-bg: #D9D0C3; /* Muted, slightly darker green-beige */
+          --delete-red: #A34C4C; /* Desaturated, earthy red */
+          --delete-red-hover: #8C3F3F; /* Slightly darker desaturated red on hover */
+          --feedback-active: #6A9560; /* Muted green for active like */
+          --feedback-dislike-active: #C96D50; /* Muted orange-red for active dislike */
 
-    /* Dark Mode Variables */
-    --dark-mode-bg: #202124;
-    --dark-mode-card-bg: #303134;
-    --dark-mode-sidebar-bg: #252629;
-    --dark-mode-border: #424242;
-    --dark-mode-text-color: #e8eaed;
-    --dark-mode-medium-text: #bdc1c6;
-    --dark-mode-chat-user-bg: #2e4a3e; /* Darker green tint for user messages in dark mode */
-    --dark-mode-chat-ai-bg: #3a475a; /* Darker blue tint for AI messages in dark mode */
-    --dark-mode-hover-light: #424242;
-    --dark-mode-active-bg: #1a73e8; /* Keep primary blue for active highlight */
-    --dark-mode-feedback-active: #28a745; /* Green for active like */
-    --dark-mode-feedback-dislike-active: #dc3545; /* Red for active dislike */
-}
+          /* Dark Mode Variables */
+          --dark-mode-bg: #2C3E33; /* Deep, dark forest green */
+          --dark-mode-card-bg: #3A4F42; /* Slightly lighter, rich dark brown/green */
+          --dark-mode-sidebar-bg: #2F4438; /* Darker, desaturated green */
+          --dark-mode-border: #5A5248; /* Dark, muted brown */
+          --dark-mode-text-color: #EFE3D5; /* Light, warm beige */
+          --dark-mode-medium-text: #A39A8E; /* Muted light brown/grey */
+          --dark-mode-chat-user-bg: #4B6658; /* Deep, muted green for user messages in dark mode */
+          --dark-mode-chat-ai-bg: #556877; /* Deep, muted blue-grey for AI messages in dark mode */
+          --dark-mode-hover-light: #485F51; /* Slightly lighter dark-mode-card-bg */
+          --dark-mode-active-bg: #608A56; /* Muted, slightly brighter green for active highlight */
+          --dark-mode-feedback-active: #7BA870; /* Richer green for active like */
+          --dark-mode-feedback-dislike-active: #DA7C5B; /* Richer orange-red for active dislike */
+      }
 
-/* Apply border-box globally for easier layout calculations */
-* {
-    box-sizing: border-box;
-}
+      /* Apply border-box globally for easier layout calculations */
+      * {
+          box-sizing: border-box;
+      }
 
-body.dark-mode {
-    background-color: var(--dark-mode-bg);
-    color: var(--dark-mode-text-color);
-}
+      body.dark-mode {
+          background-color: var(--dark-mode-bg);
+          color: var(--dark-mode-text-color);
+      }
 
-.main-wrapper {
-    display: flex;
-    width: 95vw; /* Percentage width for responsiveness */
-    max-width: 1400px; /* Max width to prevent overly wide layout on large screens */
-    height: 90vh; /* Percentage height */
-    background-color: var(--light-bg);
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    overflow: hidden; /* Contains children, especially for rounded corners */
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
+      .main-wrapper {
+          display: flex;
+          width: 95vw; /* Percentage width for responsiveness */
+          max-width: 1400px; /* Max width to prevent overly wide layout on large screens */
+          height: 90vh; /* Percentage height */
+          background-color: var(--light-bg);
+          border-radius: 15px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+          overflow: hidden; /* Contains children, especially for rounded corners */
+          transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      }
 
-body.dark-mode .main-wrapper {
-    background-color: var(--dark-mode-card-bg);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-}
+      body.dark-mode .main-wrapper {
+          background-color: var(--dark-mode-card-bg);
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      }
 
-.sidebar {
-    flex: 0 0 400px; /* Increased width for better text visibility */
-    background-color: var(--light-bg); /* Fixed: Changed from --sidebar-bg (undefined) to --light-bg */
-    padding: 25px;
-    border-right: 1px solid var(--neutral-border);
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-    overflow-y: auto;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-}
+      .sidebar {
+          flex: 0 0 400px; /* Increased width for better text visibility */
+          background-color: var(--light-bg); /* Fixed: Changed from --sidebar-bg (undefined) to --light-bg */
+          padding: 25px;
+          border-right: 1px solid var(--neutral-border);
+          display: flex;
+          flex-direction: column;
+          gap: 25px;
+          overflow-y: auto;
+          transition: background-color 0.3s ease, border-color 0.3s ease;
+      }
 
-body.dark-mode .sidebar {
-    background-color: var(--dark-mode-sidebar-bg);
-    border-right-color: var(--dark-mode-border);
-}
+      body.dark-mode .sidebar {
+          background-color: var(--dark-mode-sidebar-bg);
+          border-right-color: var(--dark-mode-border);
+      }
 
-.chat-container {
-    flex: 1; /* Allows it to grow and take available space */
-    display: flex;
-    flex-direction: column;
-    padding: 25px;
-    height: 100%;
-    gap: 20px; /* Add gap between children */
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-.header {
-    text-align: center;
-    margin-bottom: 30px;
-    color: var(--primary-blue);
-    flex-shrink: 0;
-}
-h1 {
-    font-size: 2.5em;
-    margin-bottom: 8px;
-    font-weight: 600;
-}
-.api-key-input,
-.prompt-input-area,
-.conversations-history,
-.prompt-management-area {
-    padding: 20px;
-    border: 1px solid var(--neutral-border);
-    border-radius: 10px;
-    background-color: #ffffff;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Subtle inner shadow */
-    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-}
+      .chat-container {
+          flex: 1; /* Allows it to grow and take available space */
+          display: flex;
+          flex-direction: column;
+          padding: 25px;
+          height: 100%;
+          gap: 20px; /* Add gap between children */
+          transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      .header {
+          text-align: center;
+          margin-bottom: 30px;
+          color: var(--primary-blue);
+          flex-shrink: 0;
+      }
+      h1 {
+          font-size: 2.5em;
+          margin-bottom: 8px;
+          font-weight: 600;
+      }
+      .api-key-input,
+      .prompt-input-area,
+      .conversations-history,
+      .prompt-management-area {
+          padding: 20px;
+          border: 1px solid var(--neutral-border);
+          border-radius: 10px;
+          background-color: #ffffff;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Subtle inner shadow */
+          transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      }
 
-body.dark-mode .api-key-input,
-body.dark-mode .prompt-input-area,
-body.dark-mode .conversations-history,
-body.dark-mode .prompt-management-area {
-    background-color: var(--dark-mode-card-bg);
-    border-color: var(--dark-mode-border);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-}
+      body.dark-mode .api-key-input,
+      body.dark-mode .prompt-input-area,
+      body.dark-mode .conversations-history,
+      body.dark-mode .prompt-management-area {
+          background-color: var(--dark-mode-card-bg);
+          border-color: var(--dark-mode-border);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
 
-.conversations-history h3,
-.prompt-management-area h3 {
-    color: var(--primary-blue);
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 1.2em;
-    border-bottom: 1px solid var(--neutral-border);
-    padding-bottom: 10px;
-    transition: border-color 0.3s ease;
-}
+      .conversations-history h3,
+      .prompt-management-area h3 {
+          color: var(--primary-blue);
+          margin-top: 0;
+          margin-bottom: 15px;
+          font-size: 1.2em;
+          border-bottom: 1px solid var(--neutral-border);
+          padding-bottom: 10px;
+          transition: border-color 0.3s ease;
+      }
 
-body.dark-mode .conversations-history h3,
-body.dark-mode .prompt-management-area h3 {
-    border-bottom-color: var(--dark-mode-border);
-}
+      body.dark-mode .conversations-history h3,
+      body.dark-mode .prompt-management-area h3 {
+          border-bottom-color: var(--dark-mode-border);
+      }
 
-#conversationsList,
-#savedPromptsList {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    max-height: 200px; /* Increased height */
-    overflow-y: auto;
-}
-#conversationsList li,
-#savedPromptsList li {
-    padding: 12px 10px;
-    border-bottom: 1px solid var(--neutral-border);
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease, border-color 0.3s ease, color 0.3s ease;
-    font-size: 0.95em;
-    color: var(--medium-text);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-    padding-right: 50px; /* Adjusted padding for new button size */
-}
+      #conversationsList,
+      #savedPromptsList {
+          list-style: none;
+          padding: 0;\n    margin: 0;
+          max-height: 200px; /* Increased height */
+          overflow-y: auto;
+      }
+      #conversationsList li,
+      #savedPromptsList li {
+          padding: 12px 10px;
+          border-bottom: 1px solid var(--neutral-border);
+          cursor: pointer;
+          transition: background-color 0.2s ease, transform 0.1s ease, border-color 0.3s ease, color 0.3s ease;
+          font-size: 0.95em;
+          color: var(--medium-text);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          position: relative;
+          padding-right: 50px; /* Adjusted padding for new button size */
+      }
 
-body.dark-mode #conversationsList li,
-body.dark-mode #savedPromptsList li {
-    border-bottom-color: var(--dark-mode-border);
-    color: var(--dark-mode-medium-text);
-}
+      body.dark-mode #conversationsList li,
+      body.dark-mode #savedPromptsList li {
+          border-bottom-color: var(--dark-mode-border);
+          color: var(--dark-mode-medium-text);
+      }
 
-#conversationsList li:hover,
-#savedPromptsList li:hover {
-    background-color: var(--hover-light);
-    transform: translateY(-1px);
-}
+      #conversationsList li:hover,
+      #savedPromptsList li:hover {
+          background-color: var(--hover-light);
+          transform: translateY(-1px);
+      }
 
-body.dark-mode #conversationsList li:hover,
-body.dark-mode #savedPromptsList li:hover {
-    background-color: var(--dark-mode-hover-light);
-}
+      body.dark-mode #conversationsList li:hover,
+      body.dark-mode #savedPromptsList li:hover {
+          background-color: var(--dark-mode-hover-light);
+      }
 
-#conversationsList li:last-child,
-#savedPromptsList li:last-child {
-    border-bottom: none;
-}
-#conversationsList li.active,
-#savedPromptsList li.active {
-    background-color: var(--active-bg);
-    font-weight: 600;
-    color: var(--primary-blue);
-    border-left: 4px solid var(--primary-blue);
-    padding-left: 6px; /* Adjust padding due to border */
-}
+      #conversationsList li:last-child,
+      #savedPromptsList li:last-child {
+          border-bottom: none;
+      }
+      #conversationsList li.active,
+      #savedPromptsList li.active {
+          background-color: var(--active-bg);
+          font-weight: 600;
+          color: var(--primary-blue);
+          border-left: 4px solid var(--primary-blue);
+          padding-left: 6px; /* Adjust padding due to border */
+      }
 
-body.dark-mode #conversationsList li.active,
-body.dark-mode #savedPromptsList li.active {
-    background-color: var(--dark-mode-active-bg);
-    color: var(--primary-blue); /* Keep primary blue for active highlight */
-}
+      body.dark-mode #conversationsList li.active,
+      body.dark-mode #savedPromptsList li.active {
+          background-color: var(--dark-mode-active-bg);
+          color: var(--primary-blue); /* Keep primary blue for active highlight */
+      }
 
-.delete-conversation-btn,
-.delete-prompt-btn {
-    background-color: var(--delete-red); /* Solid background for button */
-    border: none;
-    color: white; /* White icon color */
-    font-size: 1em; /* Adjusted font size for icon */
-    width: 28px; /* Fixed width for circular button */
-    height: 28px; /* Fixed height for circular button */
-    border-radius: 50%; /* Make it circular */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    line-height: 1;
-    opacity: 0.9; /* Slightly less opaque by default */
-    transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-}
-.delete-conversation-btn:hover,
-.delete-prompt-btn:hover {
-    background-color: var(--delete-red-hover); /* Darker red on hover */
-    opacity: 1;
-    transform: translateY(-50%) scale(1.05); /* Slight scale on hover */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* More pronounced shadow on hover */
-}
-label {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: 600;
-    color: var(--primary-blue);
-    font-size: 1.05em;
-}
-input[type="text"],
-textarea,
-select {
-    width: calc(100% - 20px); /* Account for padding */
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid var(--neutral-border);
-    border-radius: 5px;
-    font-size: 1em;
-    background-color: #ffffff;
-    color: var(--text-color);
-    transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
-}
+      .delete-conversation-btn,
+      .delete-prompt-btn {
+          background-color: var(--delete-red); /* Solid background for button */
+          border: none;
+          color: white; /* White icon color */
+          font-size: 1em; /* Adjusted font size for icon */
+          width: 28px; /* Fixed width for circular button */
+          height: 28px; /* Fixed height for circular button */
+          border-radius: 50%; /* Make it circular */
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          cursor: pointer;
+          position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          line-height: 1;
+          opacity: 0.9; /* Slightly less opaque by default */
+          transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+      }
+      .delete-conversation-btn:hover,
+      .delete-prompt-btn:hover {
+          background-color: var(--delete-red-hover); /* Darker red on hover */
+          opacity: 1;
+          transform: translateY(-50%) scale(1.05); /* Slight scale on hover */
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* More pronounced shadow on hover */
+      }
+      label {\n    display: block;
+          margin-bottom: 10px;
+          font-weight: 600;
+          color: var(--primary-blue);
+          font-size: 1.05em;
+      }
+      input[type="text"],
+      textarea,
+      select {
+          width: calc(100% - 20px); /* Account for padding */
+          padding: 10px;
+          margin-bottom: 15px;
+          border: 1px solid var(--neutral-border);
+          border-radius: 5px;
+          font-size: 1em;
+          background-color: #ffffff;
+          color: var(--text-color);
+          transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+      }
 
-body.dark-mode input[type="text"],
-body.dark-mode textarea,
-body.dark-mode select {
-    background-color: var(--dark-mode-bg);
-    border-color: var(--dark-mode-border);
-    color: var(--dark-mode-text-color);
-}
+      body.dark-mode input[type="text"],
+      body.dark-mode textarea,
+      body.dark-mode select {
+          background-color: var(--dark-mode-bg);
+          border-color: var(--dark-mode-border);
+          color: var(--dark-mode-text-color);
+      }
 
-input[type="text"]:focus,
-textarea:focus,
-select:focus {
-    border-color: var(--primary-blue);
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-}
+      input[type="text"]:focus,
+      textarea:focus,
+      select:focus {
+          border-color: var(--primary-blue);
+          outline: none;
+          box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+      }
 
-button {
-    background-color: var(--primary-blue);
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-}
+      button {
+          background-color: var(--primary-blue);
+          color: white;
+          border: none;
+          padding: 10px 15px;
+          border-radius: 5px;
+          cursor: pointer;
+          font-size: 1em;
+          transition: background-color 0.2s ease, transform 0.1s ease;
+      }
 
-button:hover {
-    background-color: var(--secondary-blue);
-    transform: translateY(-1px);
-}
+      button:hover {
+          background-color: var(--secondary-blue);
+          transform: translateY(-1px);
+      }
 
-button:active {
-    transform: translateY(0);
-}
+      button:active {
+          transform: translateY(0);
+      }
 
-/* Chat Window Specific Styles */
-.chat-window {
-    flex: 1;
-    border: 1px solid var(--neutral-border);
-    border-radius: 10px;
-    padding: 20px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    background-color: var(--light-bg);
-    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.03);
-    /* Removed margin-bottom: 20px; to let flex gap manage spacing */
-    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-}
+      /* Chat Window Specific Styles */
+      .chat-window {
+          flex: 1;
+          border: 1px solid var(--neutral-border);
+          border-radius: 10px;
+          padding: 20px;
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+          background-color: var(--light-bg);
+          box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.03);
+          /* Removed margin-bottom: 20px; to let flex gap manage spacing */
+          transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      }
 
-body.dark-mode .chat-window {
-    background-color: var(--dark-mode-card-bg);
-    border-color: var(--dark-mode-border);
-    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+      body.dark-mode .chat-window {
+          background-color: var(--dark-mode-card-bg);
+          border-color: var(--dark-mode-border);
+          box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
 
-.message {
-    max-width: 80%;
-    padding: 12px 18px;
-    border-radius: 20px;
-    line-height: 1.5;
-    word-wrap: break-word;
-    white-space: pre-wrap; /* Preserve whitespace and line breaks */
-    position: relative; /* For timestamp positioning */
-}
+      .message {
+          max-width: 80%;
+          padding: 12px 18px;
+          border-radius: 20px;
+          line-height: 1.5;
+          word-wrap: break-word;
+          white-space: pre-wrap; /* Preserve whitespace and line breaks */
+          position: relative; /* For timestamp positioning */
+      }
 
-.message.user {
-    align-self: flex-end;
-    background-color: var(--chat-user-bg);
-    color: var(--text-color);
-    border-bottom-right-radius: 5px;
-}
+      .message.user {
+          align-self: flex-end;
+          background-color: var(--chat-user-bg);
+          color: var(--text-color);
+          border-bottom-right-radius: 5px;
+      }
 
-body.dark-mode .message.user {
-    background-color: var(--dark-mode-chat-user-bg);
-    color: var(--dark-mode-text-color);
-}
+      body.dark-mode .message.user {
+          background-color: var(--dark-mode-chat-user-bg);
+          color: var(--dark-mode-text-color);
+      }
 
-.message.ai {
-    align-self: flex-start;
-    background-color: var(--chat-ai-bg);
-    color: var(--text-color);
-    border-bottom-left-radius: 5px;
-}
+      .message.ai {
+          align-self: flex-start;
+          background-color: var(--chat-ai-bg);
+          color: var(--text-color);
+          border-bottom-left-radius: 5px;
+      }
 
-body.dark-mode .message.ai {
-    background-color: var(--dark-mode-chat-ai-bg);
-    color: var(--dark-mode-text-color);
-}
+      body.dark-mode .message.ai {
+          background-color: var(--dark-mode-chat-ai-bg);
+          color: var(--dark-mode-text-color);
+      }
 
-.message .timestamp {
-    display: block;
-    font-size: 0.75em;
-    color: #888;
-    margin-top: 5px;
-    text-align: right; /* For user messages */
-}
+      .message .timestamp {
+          display: block;
+          font-size: 0.75em;
+          color: #888;
+          margin-top: 5px;
+          text-align: right; /* For user messages */
+      }
 
-.message.ai .timestamp {
-    text-align: left; /* For AI messages */
-}
+      .message.ai .timestamp {
+          text-align: left; /* For AI messages */
+      }
 
-body.dark-mode .message .timestamp {
-    color: var(--dark-mode-medium-text);
-}
+      body.dark-mode .message .timestamp {
+          color: var(--dark-mode-medium-text);
+      }
 
-/* Feedback buttons for AI messages */
-.feedback-container {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-    justify-content: flex-end; /* Align buttons to the right within user message bubble */
-}
+      /* Feedback buttons for AI messages */
+      .feedback-container {
+          display: flex;
+          gap: 8px;
+          margin-top: 10px;
+          justify-content: flex-end; /* Align buttons to the right within user message bubble */
+      }
 
-.message.ai .feedback-container {
-    justify-content: flex-start; /* Align buttons to the left within AI message bubble */
-}
+      .message.ai .feedback-container {
+          justify-content: flex-start; /* Align buttons to the left within AI message bubble */
+      }
 
-.feedback-btn {
-    background-color: #ccc; /* Default grey */
-    color: white;
-    border: none;
-    padding: 6px 10px;
-    border-radius: 15px;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-}
+      .feedback-btn {
+          background-color: #ccc; /* Default grey */
+          color: white;
+          border: none;
+          padding: 6px 10px;
+          border-radius: 15px;
+          cursor: pointer;
+          font-size: 0.9em;
+          transition: background-color 0.2s ease, transform 0.1s ease;
+      }
 
-.feedback-btn:hover {
-    background-color: #b0b0b0;
-    transform: translateY(-1px);
-}
+      .feedback-btn:hover {
+          background-color: #b0b0b0;
+          transform: translateY(-1px);
+      }
 
-.feedback-btn.active {
-    background-color: var(--feedback-active);
-}
+      .feedback-btn.active {
+          background-color: var(--feedback-active);
+      }
 
-.feedback-btn.dislike-btn.active {
-    background-color: var(--feedback-dislike-active);
-}
+      .feedback-btn.dislike-btn.active {
+          background-color: var(--feedback-dislike-active);
+      }
 
-body.dark-mode .feedback-btn {
-    background-color: #555;
-}
+      body.dark-mode .feedback-btn {
+          background-color: #555;
+      }
 
-body.dark-mode .feedback-btn:hover {
-    background-color: #666;
-}
+      body.dark-mode .feedback-btn:hover {
+          background-color: #666;
+      }
 
-body.dark-mode .feedback-btn.active {
-    background-color: var(--dark-mode-feedback-active);
-}
+      body.dark-mode .feedback-btn.active {
+          background-color: var(--dark-mode-feedback-active);
+      }
 
-body.dark-mode .feedback-btn.dislike-btn.active {
-    background-color: var(--dark-mode-feedback-dislike-active);
-}
+      body.dark-mode .feedback-btn.dislike-btn.active {
+          background-color: var(--dark-mode-feedback-dislike-active);
+      }
 
-/* Markdown specific styles */
-.message.ai pre {
-    background-color: var(--dark-bg);
-    padding: 10px;
-    border-radius: 8px;
-    overflow-x: auto;
-    margin-top: 10px;
-    font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
-    font-size: 0.9em;
-}
+      /* Markdown specific styles */
+      .message.ai pre {
+          background-color: var(--dark-bg);
+          padding: 10px;
+          border-radius: 8px;
+          overflow-x: auto;
+          margin-top: 10px;
+          font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+          font-size: 0.9em;
+      }
 
-body.dark-mode .message.ai pre {
-    background-color: #212121;
-}
+      body.dark-mode .message.ai pre {
+          background-color: #212121;
+      }
 
-.message.ai code {
-    font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
-    background-color: var(--dark-bg);
-    padding: 2px 4px;
-    border-radius: 4px;
-    font-size: 0.95em;
-}
+      .message.ai code {
+          font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+          background-color: var(--dark-bg);
+          padding: 2px 4px;
+          border-radius: 4px;
+          font-size: 0.95em;
+      }
 
-body.dark-mode .message.ai code {
-    background-color: #333;
-}
+      body.dark-mode .message.ai code {
+          background-color: #333;
+      }
 
-.message.ai p {
-    margin-top: 0;
-    margin-bottom: 10px;
-}
+      .message.ai p {
+          margin-top: 0;
+          margin-bottom: 10px;
+      }
 
-.message.ai p:last-child {
-    margin-bottom: 0;
-}
+      .message.ai p:last-child {
+          margin-bottom: 0;
+      }
 
-.input-area {
-    display: flex;
-    gap: 10px;
-    flex-shrink: 0;
-}
+      .input-area {
+          display: flex;
+          gap: 10px;
+          flex-shrink: 0;
+      }
 
-.input-area input[type="text"] {
-    flex: 1;
-    margin-bottom: 0; /* Override default margin */
-}
+      .input-area input[type="text"] {
+          flex: 1;
+          margin-bottom: 0; /* Override default margin */
+      }
 
-.dark-mode-toggle {
-    margin-top: 20px;
-    width: 100%;
-    padding: 10px;
-    background-color: #6c757d;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
+      .dark-mode-toggle {
+          margin-top: 20px;
+          width: 100%;
+          padding: 10px;
+          background-color: #6c757d;
+          color: white;
+          border-radius: 5px;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+      }
 
-.dark-mode-toggle:hover {
-    background-color: #5a6268;
-}
+      .dark-mode-toggle:hover {
+          background-color: #5a6268;
+      }
