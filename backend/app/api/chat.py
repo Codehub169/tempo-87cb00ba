@@ -122,7 +122,7 @@ async def send_user_message_and_get_ai_response(
     db: Session = Depends(get_db)
 ):
     """Endpoint to send a user message and receive an AI response."""
-    db_conversation = crud.get_conversation(db, conversation_id);
+    db_conversation = crud.get_conversation(db, conversation_id)
     if not db_conversation:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found.")
 

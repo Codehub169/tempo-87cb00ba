@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const promptSnippet = convo.system_prompt_used.substring(0, 30) + '...';
                 const date = new Date(convo.created_at).toLocaleDateString();
                 // Add delete button
-                listItem.innerHTML = `<span>${promptSnippet}</span><span class=\"date-span\">${date}</span><button class=\"delete-btn\" data-id=\"${convo.id}\">🗑️</button>`;
+                listItem.innerHTML = `<span>${promptSnippet}</span><span class="date-span">${date}</span><button class="delete-btn" data-id="${convo.id}">🗑️</button>`;
 
                 listItem.addEventListener('click', (event) => {
                     // Only fetch messages if the click wasn't on the delete button
@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Add to saved prompts list for management
                     const listItem = document.createElement('li');
                     listItem.dataset.promptId = prompt.id;
-                    listItem.innerHTML = `<span>${prompt.name}</span><button class=\"delete-btn\" data-id=\"${prompt.id}\">🗑️</button>`;
+                    listItem.innerHTML = `<span>${prompt.name}</span><button class="delete-btn" data-id="${prompt.id}">🗑️</button>`;
                     
                     // Add event listener for delete button
                     const deleteBtn = listItem.querySelector('.delete-btn');
@@ -302,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const newPrompt = await response.json();
-            displayMessage({ sender: 'ai', content: `Prompt \"${newPrompt.name}\" saved successfully.` });
+            displayMessage({ sender: 'ai', content: `Prompt "${newPrompt.name}" saved successfully.` });
             newPromptNameInput.value = '';
             newPromptContentTextarea.value = '';
             await loadPrompts(); // Reload prompts to show the new one
@@ -358,7 +358,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const conversation = await response.json();
             currentConversationId = conversation.id;
             chatWindow.innerHTML = ''; // Clear chat window for new conversation
-            displayMessage({ sender: 'ai', content: `New conversation started with prompt: \"${systemPromptSelect.options[systemPromptSelect.selectedIndex].text}\"` });
+            displayMessage({ sender: 'ai', content: `New conversation started with prompt: "${systemPromptSelect.options[systemPromptSelect.selectedIndex].text}"` });
             console.log('New conversation started:', conversation);
             await loadConversations(); // Reload conversations to show the new one
 
@@ -476,5 +476,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial setup: Load past conversations and prompt the user
     loadConversations();
     loadPrompts(); // Load prompts on startup
-    displayMessage({ sender: 'ai', content: 'Welcome to PromptCraft AI Chat! Please enter your Gemini API Key, then choose a system prompt and click \"Start New Conversation\" to begin.' });
+    displayMessage({ sender: 'ai', content: 'Welcome to PromptCraft AI Chat! Please enter your Gemini API Key, then choose a system prompt and click "Start New Conversation" to begin.' });
 });
